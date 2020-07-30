@@ -1,0 +1,10 @@
+*.idea/
+*bin/
+*geckodriver.log
+*include/
+*lib/
+*lib64
+*selenium3/
+*test_selenium.py
+*wunder_csv/
+*wunder_html/
