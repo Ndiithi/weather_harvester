@@ -24,8 +24,8 @@ capabilities["phantomjs.page.settings.userAgent"] = (
 months_days = [31,31,31,30,31,30,31,31,30,31,30,31]
 
 AIRPORT_CODE = "HKKI"
-START_DATE = datetime(2020, 1, 30)
-END_DATE = datetime(2020, 2, 1) + timedelta(days=1)
+START_DATE = datetime(2008, 3, 21)
+END_DATE = datetime(2020, 6, 30) + timedelta(days=1)
 
 lookup_url = "http://www.wunderground.com/history/daily/{}/date/{}-{}-{}"
 
@@ -66,25 +66,28 @@ while cur_date != END_DATE:
 
     ## This starts an instance of Firefox at the specified URL:
     driver.get(url)
-    time.sleep(20)
-    tables = WebDriverWait(driver, 20).until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "table")))
-    print("done wait mode")
-    table = pd.read_html(tables[-1].get_attribute('outerHTML'))
-    table = table[0]
+    time.sleep(40)
+    try:
+        tables = WebDriverWait(driver, 20).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "table")))
+        print("done wait mode")
+        table = pd.read_html(tables[-1].get_attribute('outerHTML'))
+        table = table[0]
 
-    table.to_csv("./wunder_csv/{}_{}-{}-{}.csv".format(AIRPORT_CODE, str(cur_date.year),
-                                                       str(cur_date.month), str(cur_date.day)),  encoding='utf-8')
+        table.to_csv("./wunder_csv/{}_{}-{}-{}.csv".format(AIRPORT_CODE, str(cur_date.year),
+                                                           str(cur_date.month), str(cur_date.day)),  encoding='utf-8')
 
-    html = driver.page_source
+        html = driver.page_source
+
+
+        outfile_name = "wunder_html/{}_{}-{}-{}.html".format(AIRPORT_CODE, cur_date.year,
+                                                             cur_date.month, cur_date.day)
+
+        with open(outfile_name, 'w') as out_file:
+            out_file.write(html.encode('utf8'))
+    except Exception, e:
+        print e
     driver.close()
-
-    outfile_name = "wunder_html/{}_{}-{}-{}.html".format(AIRPORT_CODE, cur_date.year,
-                                                         cur_date.month, cur_date.day)
-
-    with open(outfile_name, 'w') as out_file:
-        out_file.write(html.encode('utf8'))
-
 
     if months_days[cur_date.month-1]==cur_date.day:
         if cur_date.month is not 12:
